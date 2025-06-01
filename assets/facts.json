@@ -1,0 +1,17 @@
+[
+  {
+    "level": "primary",
+    "category": "history",
+    "text": "Mansa Musa was the richest man in history."
+  },
+  {
+    "level": "junior_high",
+    "category": "science",
+    "text": "The speed of light is 299,792,458 m/s."
+  },
+  {
+    "level": "high_school",
+    "category": "math",
+    "text": "The Pythagorean theorem states that a² + b² = c²."
+  }
+]
