@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edu sync hub Africa - Student Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="animations.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+</head>
+<body>
+  <div class="sidebar">
+    <button class="hamburger">☰</button>
+    <ul>
+      <li><a href="#profile">Profile</a></li>
+      <li><a href="#check-points">Check Points</a></li>
+      <li><a href="#my-diary">My Diary</a></li>
+      <li><a href="#my-schedule">My Schedule</a></li>
+      <li><a href="#assignments">Assignments</a></li>
+      <li><a href="#elijah">Elijah (Ask AI)</a></li>
+      <li><a href="#wanga">Wanga (Career Plan)</a></li>
+      <li><a href="#emma">Emma (Talent Strategy)</a></li>
+      <li><a href="#fun-study">Fun Study</a></li>
+      <li><a href="#chat-contact">Chat & Contact</a></li>
+      <li><a href="#notifications">Notifications</a></li>
+      <li><a href="#" id="logout">Logout</a></li>
+    </ul>
+  </div>
+  <div class="main-content">
+    <section id="profile" class="section">Profile Content</section>
+    <section id="check-points" class="section">Check Points Content</section>
+    <section id="my-diary" class="section">My Diary Content</section>
+    <section id="my-schedule" class="section">My Schedule Content</section>
+    <section id="assignments" class="section">Assignments Content</section>
+    <section id="elijah" class="section">Elijah AI Chat</section>
+    <section id="wanga" class="section">Wanga Career Plan</section>
+    <section id="emma" class="section">Emma Talent Strategy</section>
+    <section id="fun-study" class="section">
+      Fun Study Content
+      <div id="fact-widget"></div>
+    </section>
+    <section id="chat-contact" class="section">Chat & Contact Content</section>
+    <section id="notifications" class="section">Notifications Content</section>
+  </div>
+  <div id="simulation-modal" class="modal">
+    <div class="swiper-container">
+      <div class="swiper-wrapper"></div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+    </div>
+  </div>
+  <div id="notification-banner" class="notification-banner"></div>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-messaging.js"></script>
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="auth.js"></script>
+  <script src="student-dashboard.js"></script>
+  <script src="notifications.js"></script>
+  <script src="facts.js"></script>
+  <script src="chat.js"></script>
+  <script src="gamification.js"></script>
+  <script src="ai-mocks.js"></script>
+  <script src="drive-integration.js"></script>
+</body>
+</html>
