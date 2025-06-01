@@ -5,6 +5,22 @@ services:
     buildCommand: npm install
     staticPublishPath: .
     pullRequestPreviewsEnabled: true
+    routes:
+      - type: rewrite
+        source: /login.html
+        destination: /login.html
+      - type: rewrite
+        source: /signup.html
+        destination: /signup.html
+      - type: rewrite
+        source: /student-dashboard.html
+        destination: /student-dashboard.html
+      - type: rewrite
+        source: /admin-dashboard.html
+        destination: /admin-dashboard.html
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: NODE_VERSION
         value: 18
