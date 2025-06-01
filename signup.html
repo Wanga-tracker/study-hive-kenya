@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edu sync hub Africa - Signup</title>
+  <style>
+    body {
+      background: #1A1A2E;
+      color: #FFFFFF;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .auth-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .logo {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+    .neon-gradient {
+      background: linear-gradient(45deg, #FF007A, #00DDEB);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      width: 300px;
+    }
+    input, select {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #00DDEB;
+      background: #1A1A2E;
+      color: #FFFFFF;
+    }
+    .button {
+      background: linear-gradient(45deg, #FF007A, #00DDEB);
+      border: none;
+      padding: 10px 20px;
+      color: #FFFFFF;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .button:hover {
+      opacity: 0.9;
+    }
+    .error {
+      color: #FF007A;
+      margin-top: 10px;
+    }
+    a {
+      color: #00DDEB;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <img src="assets/logo.svg" alt="Edu sync hub Africa Logo" class="logo">
+    <h2 class="neon-gradient">Signup</h2>
+    <form id="signup-form">
+      <input type="text" id="name" placeholder="Full Name" required>
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="tel" id="phone" placeholder="Phone Number" required>
+      <input type="text" id="county" placeholder="County" required>
+      <input type="text" id="school" placeholder="School Name" required>
+      <select id="level" required>
+        <option value="" disabled selected>Select Grade Level</option>
+        <option value="primary">Primary</option>
+        <option value="junior_high">Junior High</option>
+        <option value="secondary">Secondary</option>
+      </select>
+      <input type="password" id="password" placeholder="Password (6+ characters)" required>
+      <input type="text" id="referral" placeholder="Referral Code (optional)">
+      <button type="submit" class="button">Sign Up</button>
+    </form>
+    <p><a href="login.html">Already have an account? Login</a></p>
+    <div id="error-message" class="error"></div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    // Initialize Firebase
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch (error) {
+      console.error('Firebase initialization failed:', error);
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Handle Signup
+    document.getElementById('signup-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const county = document.getElementById('county').value.trim();
+      const school = document.getElementById('school').value.trim();
+      const level = document.getElementById('level').value;
+      const password = document.getElementById('password').value;
+      const referral = document.getElementById('referral').value.trim();
+      const errorMessage = document.getElementById('error-message');
+
+      // Validate inputs
+      if (!name || !username || !email || !phone || !county || !school || !level) {
+        errorMessage.textContent = 'Please fill all required fields.';
+        return;
+      }
+      if (password.length < 6) {
+        errorMessage.textContent = 'Password must be at least 6 characters.';
+        return;
+      }
+
+      // Check username uniqueness
+      db.collection('users').where('username', '==', username).get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            errorMessage.textContent = 'Username already taken.';
+            return;
+          }
+          console.log('Creating user with email:', email);
+          return auth.createUserWithEmailAndPassword(email, password);
+        })
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log('User created:', user.email);
+          return db.collection('users').doc(user.uid).set({
+            name: name,
+            username: username,
+            email: email,
+            phone: phone,
+            county: county,
+            school: school,
+            level: level,
+            role: 'student',
+            coins: referral ? 10 : 0,
+            hasSeenSimulation: false,
+            referralCode: referral || null,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        })
+        .then(() => {
+          console.log('User data saved to Firestore');
+          window.location.href = 'student-dashboard.html';
+        })
+        .catch((error) => {
+          console.error('Signup error:', error);
+          errorMessage.textContent = error.message;
+        });
+    });
+
+    // Redirect if already logged in
+    auth.onAuthStateChanged(user => {
+      if (user && window.location.pathname.endsWith('signup.html')) {
+        db.collection('users').doc(user.uid).get()
+          .then(doc => {
+            if (doc.exists) {
+              const role = doc.data().role;
+              console.log('Authenticated user, redirecting to:', role);
+              if (role === 'admin') {
+                window.location.href = 'admin-dashboard.html';
+              } else {
+                window.location.href = 'student-dashboard.html';
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Firestore error:', error);
+          });
+      }
+    });
+  </script>
+</body>
+</html>
