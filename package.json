@@ -1,0 +1,14 @@
+{
+  "name": "edu-hub-kenya",
+  "version": "1.0.0",
+  "description": "Education platform for African students",
+  "scripts": {
+    "start": "serve -s .",
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "firebase": "^11.8.1",
+    "swiper": "^11.1.14",
+    "serve": "^14.2.3"
+  }
+}
