@@ -10,20 +10,27 @@
       color: #FFFFFF;
       font-family: 'Poppins', sans-serif;
       margin: 0;
-      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
     .auth-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 25px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 20px rgba(0, 221, 235, 0.5);
+      backdrop-filter: blur(5px);
     }
     .logo {
       width: 150px;
-      margin-bottom: 20px;
+      margin: 0 auto;
+      display: block;
     }
-    .neon-gradient {
+    h2 {
+      text-align: center;
       background: linear-gradient(45deg, #FF007A, #00DDEB);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -31,7 +38,6 @@
     form {
       display: flex;
       flex-direction: column;
-      width: 300px;
     }
     input, select {
       margin: 10px 0;
@@ -39,32 +45,39 @@
       border: 1px solid #00DDEB;
       background: #1A1A2E;
       color: #FFFFFF;
+      border-radius: 8px;
     }
     .button {
       background: linear-gradient(45deg, #FF007A, #00DDEB);
       border: none;
-      padding: 10px 20px;
+      padding: 12px;
       color: #FFFFFF;
       cursor: pointer;
-      border-radius: 5px;
+      border-radius: 8px;
+      transition: 0.3s;
     }
     .button:hover {
-      opacity: 0.9;
+      box-shadow: 0 0 12px #00DDEB;
     }
     .error {
       color: #FF007A;
+      text-align: center;
       margin-top: 10px;
     }
-    a {
-      color: #00DDEB;
+    .switch {
+      text-align: center;
       margin-top: 10px;
+    }
+    .switch a {
+      color: #00DDEB;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
   <div class="auth-container">
     <img src="assets/logo.svg" alt="Edu sync hub Africa Logo" class="logo">
-    <h2 class="neon-gradient">Signup</h2>
+    <h2>Create Account</h2>
     <form id="signup-form">
       <input type="text" id="name" placeholder="Full Name" required>
       <input type="text" id="username" placeholder="Username" required>
@@ -82,39 +95,31 @@
       <input type="text" id="referral" placeholder="Referral Code (optional)">
       <button type="submit" class="button">Sign Up</button>
     </form>
-    <p><a href="login.html">Already have an account? Login</a></p>
+    <div class="switch">
+      Already have an account? <a href="login.html">Log In</a>
+    </div>
     <div id="error-message" class="error"></div>
   </div>
-  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js"></script>
-  <script src="firebase-config.js"></script>
-  <script>
-    // Initialize Firebase
-    try {
-      firebase.initializeApp(firebaseConfig);
-    } catch (error) {
-      console.error('Firebase initialization failed:', error);
-    }
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.8.2/firebase-auth.js';
+    import { doc, setDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.8.2/firebase-firestore.js';
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const form = document.getElementById('signup-form');
+    const errorMessage = document.getElementById('error-message');
 
-    // Handle Signup
-    document.getElementById('signup-form').addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const username = document.getElementById('username').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const county = document.getElementById('county').value.trim();
-      const school = document.getElementById('school').value.trim();
-      const level = document.getElementById('level').value;
-      const password = document.getElementById('password').value;
-      const referral = document.getElementById('referral').value.trim();
-      const errorMessage = document.getElementById('error-message');
+      const name = form.name.value.trim();
+      const username = form.username.value.trim();
+      const email = form.email.value.trim();
+      const phone = form.phone.value.trim();
+      const county = form.county.value.trim();
+      const school = form.school.value.trim();
+      const level = form.level.value;
+      const password = form.password.value;
+      const referral = form.referral.value.trim();
 
-      // Validate inputs
       if (!name || !username || !email || !phone || !county || !school || !level) {
         errorMessage.textContent = 'Please fill all required fields.';
         return;
@@ -124,64 +129,41 @@
         return;
       }
 
-      // Check username uniqueness
-      db.collection('users').where('username', '==', username).get()
-        .then(snapshot => {
-          if (!snapshot.empty) {
-            errorMessage.textContent = 'Username already taken.';
-            return;
-          }
-          console.log('Creating user with email:', email);
-          return auth.createUserWithEmailAndPassword(email, password);
-        })
-        .then((userCredential) => {
-          const user = userCredential.user;
-          console.log('User created:', user.email);
-          return db.collection('users').doc(user.uid).set({
-            name: name,
-            username: username,
-            email: email,
-            phone: phone,
-            county: county,
-            school: school,
-            level: level,
-            role: 'student',
-            coins: referral ? 10 : 0,
-            hasSeenSimulation: false,
-            referralCode: referral || null,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        })
-        .then(() => {
-          console.log('User data saved to Firestore');
-          window.location.href = 'student-dashboard.html';
-        })
-        .catch((error) => {
-          console.error('Signup error:', error);
-          errorMessage.textContent = error.message;
-        });
-    });
+      try {
+        // Check username uniqueness
+        const usernameQuery = query(collection(db, 'users'), where('username', '==', username));
+        const usernameSnapshot = await getDocs(usernameQuery);
+        if (!usernameSnapshot.empty) {
+          errorMessage.textContent = 'Username already taken.';
+          return;
+        }
 
-    // Redirect if already logged in
-    auth.onAuthStateChanged(user => {
-      if (user && window.location.pathname.endsWith('signup.html')) {
-        db.collection('users').doc(user.uid).get()
-          .then(doc => {
-            if (doc.exists) {
-              const role = doc.data().role;
-              console.log('Authenticated user, redirecting to:', role);
-              if (role === 'admin') {
-                window.location.href = 'admin-dashboard.html';
-              } else {
-                window.location.href = 'student-dashboard.html';
-              }
-            }
-          })
-          .catch(error => {
-            console.error('Firestore error:', error);
-          });
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log('User created:', user.email);
+
+        await setDoc(doc(db, 'users', user.uid), {
+          name,
+          username,
+          email,
+          phone,
+          county,
+          school,
+          level,
+          role: 'student',
+          coins: referral ? 10 : 0,
+          hasSeenSimulation: false,
+          referralCode: referral || null,
+          createdAt: new Date()
+        });
+
+        console.log('User data saved to Firestore');
+        window.location.href = 'student-dashboard.html';
+      } catch (error) {
+        console.error('Signup error:', error.code, error.message);
+        errorMessage.textContent = error.message;
       }
     });
   </script>
 </body>
-</html>
+        </html>
