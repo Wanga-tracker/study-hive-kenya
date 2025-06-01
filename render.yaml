@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: edu-hub-kenya
+    env: static
+    buildCommand: npm install
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: true
+    envVars:
+      - key: NODE_VERSION
+        value: 18
