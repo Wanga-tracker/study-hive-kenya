@@ -1,0 +1,22 @@
+.card {
+  background: #2A2A3E;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 221, 235, 0.5);
+}
+.button {
+  background: linear-gradient(45deg, #FF007A, #00DDEB);
+  border: none;
+  padding: 10px 20px;
+  color: #FFFFFF;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.input {
+  padding: 10px;
+  border: 1px solid #00DDEB;
+  background: #1A1A2E;
+  color: #FFFFFF;
+  width: 100%;
+}
